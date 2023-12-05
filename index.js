@@ -1,7 +1,7 @@
 const req = require("express/lib/request");
 const http = require("http")
 const socketio = require('socket.io')
-
+const connect = require('./config/database-config')
 const express = require("express");
 const app = express();
 const server = http.createServer(app)
@@ -23,12 +23,18 @@ io.on('connection', (socket) => {
         // socket.broadcast.emit('msg_rcvd', data) // send to all except sender
         io.emit('msg_rcvd', data)
     })
+    //rooms
+    //using roots people can connect to separate socktes that you specify
+    //when people sent msg in room then only person in room will get msg
+
 })
 
 // app.listen(3000, () => {
 //     console.log("Server is running on port 3000");
 // }); will give error if try to get socket js  
 
-server.listen(3000, () => {
+server.listen(3000, async () => {
     console.log("Server is running on port 3000");
-})
+    await connect();
+    console.log("mongodb connected")
+})  
