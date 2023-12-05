@@ -8,15 +8,21 @@ const server = http.createServer(app)
 const io = socketio(server)
 app.use('/', express.static(__dirname + '/public'));
 
-io.on('connection',(socket) => {
-    console.log('a user connected',socket.id)
+io.on('connection', (socket) => {
+    console.log('a user connected', socket.id)
 
-    socket.on('from_client',() => {
-        console.log('from_client');
-        })
+    // socket.on('from_client',() => {
+    //     console.log('from_client');
+    //     })
 
-    setInterval(() => {
-        socket.emit('from_server')},2000)
+    // setInterval(() => {
+    //     socket.emit('from_server')},2000)
+    socket.on('msg_send', (data) => {
+        console.log('msg received at server', data.msg);
+        // socket.emit('msg_rcvd', data) // send to only sender
+        // socket.broadcast.emit('msg_rcvd', data) // send to all except sender
+        io.emit('msg_rcvd', data)
+    })
 })
 
 // app.listen(3000, () => {
