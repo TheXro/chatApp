@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Chan Room</h1>
+    <%= roomId %>
+    <% name %>
+    <input type="text" id="newmsg" placeholder="Enter your message" />
+    <button id="btn">Send</button>
+    <ul id="msglist"></ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        var socket = io();
+
+        let btn = document.getElementById('btn');
+        let msglist = document.getElementById('msglist');
+        let inputmsg = document.getElementById('newmsg');
+
+        btn.onclick = function() {
+            console.log('clicked')
+            socket.emit('msg_send', inputmsg.value);
+            inputmsg.value = '';
+        }
+
+        socket.on('msg_rcvd', function(data) {
+            let li = document.createElement('li');
+            li.innerText = data;
+            msglist.appendChild(li);
+        });
+
+
+
+    </script>
+</body>
+</html>
