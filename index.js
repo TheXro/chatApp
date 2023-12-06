@@ -6,7 +6,7 @@ const express = require("express");
 const app = express();
 const server = http.createServer(app)
 const io = socketio(server)
-
+const Chat = require('./models/chat')
 app.set('view engine', 'ejs');
 app.use('/', express.static(__dirname + '/public'));
 
@@ -25,10 +25,17 @@ io.on('connection', (socket) => {
 
     // setInterval(() => {
     //     socket.emit('from_server')},2000)
-    socket.on('msg_send', (data) => {
+    socket.on('msg_send', async (data) => {
         console.log('msg received at server', data);
+
         // socket.emit('msg_rcvd', data) // send to only sender
         //     // socket.broadcast.emit('msg_rcvd', data) // send to all except sender
+
+        const chat = await Chat.create({
+            content: data.msg,
+            user: data.username,
+            roomId: data.roomid
+        })
         io.to(data.roomid).emit('msg_rcvd', data)
     })
     //rooms
@@ -46,11 +53,14 @@ io.on('connection', (socket) => {
 //     console.log("Server is running on port 3000");
 // }); will give error if try to get socket js  
 
-app.get('/chat/:roomId', (req, res) => {
+app.get('/chat/:roomId', async (req, res) => {
+    const chats = await Chat.find({ roomId: req.params.roomId }).sort({ createdAt: 1 });
     res.render('index', {
-        id: req.params.roomId
+        id: req.params.roomId,
+        chats
         //     name: 'thexro'
     });
+    console.log(chats)
 })
 
 

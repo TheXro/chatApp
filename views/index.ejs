@@ -7,11 +7,15 @@
 </head>
 <body>
     <h1>Chan Room</h1>
-    <button id="startchat" data-roomid="<%= id %>">Start Chat</button>
-    <input type="text" id="username">
+    <input id="startchat" data-roomid="<%= id %>" type="hidden" />
+    <input type="text" id="username" placeholder="username">
     <input type="text" id="newmsg" placeholder="Enter your message" />
     <button id="btn">Send</button>
-    <ul id="msglist"></ul>
+    <ul id="msglist">
+        <% for( let i = 0; i < chats.length; i++ ) { %>
+            <li><%= chats[i].user %>: <%= chats[i].content %></li>
+        <% } %>
+    </ul>
     <script src="/socket.io/socket.io.js"></script>
     <script>
 
@@ -22,22 +26,22 @@
         let msglist = document.getElementById('msglist');
         let inputmsg = document.getElementById('newmsg');
 
-        btn.onclick = function() {
-            console.log('clicked')
-            socket.emit('msg_send', {msg:inputmsg.value, roomid:startchat.getAttribute('data-roomid')});
-        
-            console.log(inputmsg.value);
-        }
-        startchat.onclick = function exec() {
-            socket.emit('join_room', {
+        socket.emit('join_room', {
                 roomid: startchat.getAttribute('data-roomid'),
                 username: document.getElementById('username').value
             });
+
+        btn.onclick = function() {
+            console.log('clicked')
+            socket.emit('msg_send', {msg:inputmsg.value, roomid:startchat.getAttribute('data-roomid'), username:document.getElementById('username').value});
+        
+            console.log(inputmsg.value);
         }
+            
 
         socket.on('msg_rcvd', function(data) {
             let li = document.createElement('li');
-            li.innerText = data.msg;
+            li.innerText = data.username + ":" + data.msg; 
             msglist.appendChild(li);
         });
 
