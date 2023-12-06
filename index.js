@@ -17,13 +17,19 @@ io.on('connection', (socket) => {
     //     console.log('from_client');
     //     })
 
+    socket.on('join_room', (data) => {
+        socket.join(data.roomid, (data) => {
+            console.log('joinned', data);
+        });
+    })
+
     // setInterval(() => {
     //     socket.emit('from_server')},2000)
     socket.on('msg_send', (data) => {
-        console.log('msg received at server', data.msg);
+        console.log('msg received at server', data);
         // socket.emit('msg_rcvd', data) // send to only sender
-    //     // socket.broadcast.emit('msg_rcvd', data) // send to all except sender
-        io.emit('msg_rcvd', data)
+        //     // socket.broadcast.emit('msg_rcvd', data) // send to all except sender
+        io.to(data.roomid).emit('msg_rcvd', data)
     })
     //rooms
     //using roots people can connect to separate socktes that you specify
@@ -41,11 +47,10 @@ io.on('connection', (socket) => {
 // }); will give error if try to get socket js  
 
 app.get('/chat/:roomId', (req, res) => {
-    // res.render('index', {
-    //     roomId: req.params.roomId,
-    //     name: 'thexro'
-    // });
-    
+    res.render('index', {
+        id: req.params.roomId
+        //     name: 'thexro'
+    });
 })
 
 

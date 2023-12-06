@@ -7,8 +7,8 @@
 </head>
 <body>
     <h1>Chan Room</h1>
-    <%= roomId %>
-    <% name %>
+    <button id="startchat" data-roomid="<%= id %>">Start Chat</button>
+    <input type="text" id="username">
     <input type="text" id="newmsg" placeholder="Enter your message" />
     <button id="btn">Send</button>
     <ul id="msglist"></ul>
@@ -16,6 +16,7 @@
     <script>
 
         var socket = io();
+        let startchat = document.getElementById('startchat');
 
         let btn = document.getElementById('btn');
         let msglist = document.getElementById('msglist');
@@ -23,13 +24,20 @@
 
         btn.onclick = function() {
             console.log('clicked')
-            socket.emit('msg_send', inputmsg.value);
-            inputmsg.value = '';
+            socket.emit('msg_send', {msg:inputmsg.value, roomid:startchat.getAttribute('data-roomid')});
+        
+            console.log(inputmsg.value);
+        }
+        startchat.onclick = function exec() {
+            socket.emit('join_room', {
+                roomid: startchat.getAttribute('data-roomid'),
+                username: document.getElementById('username').value
+            });
         }
 
         socket.on('msg_rcvd', function(data) {
             let li = document.createElement('li');
-            li.innerText = data;
+            li.innerText = data.msg;
             msglist.appendChild(li);
         });
 
