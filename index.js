@@ -31,6 +31,7 @@ io.on('connection', (socket) => {
         // socket.emit('msg_rcvd', data) // send to only sender
         //     // socket.broadcast.emit('msg_rcvd', data) // send to all except sender
 
+        //creating room
         const chat = await Chat.create({
             content: data.msg,
             user: data.username,
@@ -43,8 +44,12 @@ io.on('connection', (socket) => {
     //when people sent msg in room then only person in room will get msg
     //
 
+    //for typing 
+    socket.on('typing', (data) => {
+        // console.log(data);
+        socket.to(data.roomid).emit('user_typing', data.username)
+    })
 
-    //creating room
 
 
 })
@@ -52,6 +57,8 @@ io.on('connection', (socket) => {
 // app.listen(3000, () => {
 //     console.log("Server is running on port 3000");
 // }); will give error if try to get socket js  
+
+
 
 app.get('/chat/:roomId', async (req, res) => {
     const chats = await Chat.find({ roomId: req.params.roomId }).sort({ createdAt: 1 });

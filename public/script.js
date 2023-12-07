@@ -31,3 +31,4 @@ socket.on('msg_rcvd',(data) => {
     li.innerHTML = data.msg;
     msglist.appendChild(li);
 });
+
